@@ -4,7 +4,7 @@ import { PlaceholdersAndVanishInput } from "./ui/placeholders-and-vanish-input";
 
 export function PlaceholdersAndVanishInputDemo() {
     const placeholders = [
-        "Build your dream website with BuildXAI...",
+        "Build your dream website with BuildXvibe...",
         "What kind of website should we create today?",
         "Turn your website ideas into reality",
         "Create a stunning e-commerce site",
