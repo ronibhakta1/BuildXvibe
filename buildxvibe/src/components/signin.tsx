@@ -11,27 +11,20 @@ import {
   FieldDescription,
   FieldGroup,
   FieldLabel,
-} from "../components/ui/field"
+} from "./ui/field"
 import { Input } from "@/components/ui/input"
 
-export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
+export function SigninForm({ ...props }: React.ComponentProps<typeof Card>) {
   return (
     <Card {...props} className="bg-zinc-100">
       <CardHeader>
-        <CardTitle>Create an account</CardTitle>
-        <CardDescription>
-          Enter your information below to create your account
-        </CardDescription>
+        <CardTitle className="font-bold text-2xl">Sign in</CardTitle>
       </CardHeader>
       <CardContent>
         <form>
           <FieldGroup>
             <Field>
-              <FieldLabel htmlFor="name">Full Name</FieldLabel>
-              <Input id="name" type="text" placeholder="Roni bhakta" required />
-            </Field>
-            <Field>
-              <FieldLabel htmlFor="email">Username</FieldLabel>
+              <FieldLabel htmlFor="username">Username</FieldLabel>
               <Input
                 id="username"
                 type="username"
@@ -39,29 +32,17 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
               />
             </Field>
             <Field>
-              <FieldLabel htmlFor="email">Email</FieldLabel>
-              <Input
-                id="email"
-                type="email"
-                placeholder="m@example.com"
-                required
-              />
-            </Field>
-            <Field>
               <FieldLabel htmlFor="password">Password</FieldLabel>
               <Input id="password" type="password" required />
-              <FieldDescription>
-                Must be at least 8 characters long.
-              </FieldDescription>
             </Field>
             <FieldGroup>
               <Field>
-                <Button type="submit">Create Account</Button>
+                <Button type="submit">Sign in</Button>
                 <Button variant="outline" type="button" className=" bg-white/10">
-                  Sign up with Google
+                  Sign in with Google
                 </Button>
                 <FieldDescription className="px-6 text-center">
-                  Already have an account? <a href="/signin">Sign in</a>
+                  Don't have an account? <a href="/signup">Sign up</a>
                 </FieldDescription>
               </Field>
             </FieldGroup>
