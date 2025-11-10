@@ -11,6 +11,6 @@ source .venv/bin/activate
 uv sync
 # or if you use a requirements.txt file:
 # uv pip install -r requirements.txt
-uv run core/api.py
+uv run main.py
 # The UserWarning should no longer appear.
 ```
