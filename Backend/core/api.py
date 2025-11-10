@@ -9,5 +9,5 @@ graph.add_edge(START, "mock_llm")
 graph.add_edge("mock_llm", END)
 graph = graph.compile()
 
-result = graph.invoke({"messages": [{"role": "user", "content": "hi!"}]})
+result = graph.invoke({"messages": [{"role": "user", "content": "whats up"}]})
 print(result["messages"][-1].pretty_print())
