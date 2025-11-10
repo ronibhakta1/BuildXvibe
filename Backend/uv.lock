@@ -60,6 +60,7 @@ dependencies = [
     { name = "fastapi", extra = ["standard"] },
     { name = "langgraph" },
     { name = "pip" },
+    { name = "python-dotenv" },
 ]
 
 [package.metadata]
@@ -68,6 +69,7 @@ requires-dist = [
     { name = "fastapi", extras = ["standard"], specifier = ">=0.121.1" },
     { name = "langgraph", specifier = ">=1.0.2" },
     { name = "pip", specifier = ">=25.3" },
+    { name = "python-dotenv", specifier = ">=1.2.1" },
 ]
 
 [[package]]

@@ -1,2 +1,4 @@
 fastapi[standard]
 langgraph==1.0.2
+e2b-code-interpreter==0.1.6
+uvicorn[standard]==0.22.0
