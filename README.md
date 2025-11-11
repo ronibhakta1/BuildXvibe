@@ -14,3 +14,8 @@ uv sync
 uv run main.py
 # The UserWarning should no longer appear.
 ```
+
+```bash
+uv run core/build.py     
+uv run -m core.e2b_runner
+```
