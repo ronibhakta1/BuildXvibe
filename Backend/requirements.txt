@@ -1,0 +1,5 @@
+fastapi[standard]
+langgraph
+e2b-code-interpreter
+uvicorn[standard]
+dotenv
