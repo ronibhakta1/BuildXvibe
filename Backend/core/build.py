@@ -1,10 +1,11 @@
+# build.py
 from e2b import Template, default_build_logger
-from template import template
+from .template import template as nextjsTemplate
 
-Template.build(
-    template,
-    alias="node-npm-vite",
-    cpu_count=2,
-    memory_mb=2048,
+Template.build(nextjsTemplate,
+    alias="nextjs-app",
+    cpu_count=4,
+    memory_mb=4096,
     on_build_logs=default_build_logger(),
+    
 )

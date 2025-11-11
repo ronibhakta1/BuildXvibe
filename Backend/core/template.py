@@ -1,31 +1,17 @@
-from e2b import Template, wait_for_port
 from dotenv import load_dotenv
 load_dotenv()
+from e2b import Template, wait_for_url
 
 template = (
     Template()
-    .from_ubuntu_image("22.04")
-    .run_cmd("curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -")
-    .apt_install(["nodejs"])
-    .set_workdir("/home/user/project")
-    .run_cmd("npm create vite@latest my-app -- --template react-ts")
-    .set_workdir("/home/user/project/my-app")
-    .run_cmd("npm install")
-    .run_cmd("rm -f vite.config.ts vite.config.js")
-    .run_cmd("echo \"import { defineConfig } from 'vite'\" > vite.config.ts")
-    .run_cmd("echo \"import react from '@vitejs/plugin-react'\" >> vite.config.ts")
-    .run_cmd("echo \"\" >> vite.config.ts")
-    .run_cmd("echo \"export default defineConfig({\" >> vite.config.ts")
-    .run_cmd("echo \"  plugins: [react()],\" >> vite.config.ts")
-    .run_cmd("echo \"  server: {\" >> vite.config.ts")
-    .run_cmd("echo \"    host: '0.0.0.0',\" >> vite.config.ts")
-    .run_cmd("echo \"    port: 5173,\" >> vite.config.ts")
-    .run_cmd("echo \"    strictPort: true,\" >> vite.config.ts")
-    .run_cmd("echo \"    allowedHosts: ['.e2b.app', 'localhost'],\" >> vite.config.ts")
-    .run_cmd("echo \"    hmr: {\" >> vite.config.ts")
-    .run_cmd("echo \"      clientPort: 5173\" >> vite.config.ts")
-    .run_cmd("echo \"    }\" >> vite.config.ts")
-    .run_cmd("echo \"  }\" >> vite.config.ts")
-    .run_cmd("echo \"})\" >> vite.config.ts")
-    .set_start_cmd("npm run dev -- --host 0.0.0.0", wait_for_port(5173))
+    .from_node_image("21-slim")
+    .set_workdir("/home/user/nextjs-app")
+    .run_cmd(
+        'npx create-next-app@14.2.30 . --ts --tailwind --no-eslint --import-alias "@/*" --use-npm --no-app --no-src-dir'
+    )
+    .run_cmd("npx shadcn@2.1.7 init -d")
+    .run_cmd("npx shadcn@2.1.7 add --all")
+    .run_cmd("mv /home/user/nextjs-app/* /home/user/ && rm -rf /home/user/nextjs-app")
+    .set_workdir("/home/user")
+    .set_start_cmd("npx next --turbo", wait_for_url('http://localhost:3000'))
 )
