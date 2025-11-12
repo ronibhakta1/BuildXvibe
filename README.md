@@ -19,3 +19,7 @@ uv run main.py
 uv run core/build.py     
 uv run -m core.e2b_runner
 ```
+
+```bash
+postgresql://[user]:[password]@[host]:[port]/[database_name]
+```

@@ -1,15 +1,15 @@
 services:
-  redis:
-    image: redis:7.4-alpine 
-    restart: always
-    container_name: redis
+  postgres-db:
+    image: postgres:16
+    container_name: postgres_container
+    restart: unless-stopped
+    ports:
+      - "5432:5432" 
     env_file:
       - .env
-    ports:
-      - '6379:6379' 
     volumes:
-      - redis_data:/data 
+      - postgres_data:/var/lib/postgresql/data 
 
 volumes:
-  redis_data:
+  postgres_data:
     driver: local
