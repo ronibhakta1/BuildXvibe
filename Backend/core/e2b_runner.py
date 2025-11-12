@@ -1,40 +1,182 @@
-from dotenv import load_dotenv
-load_dotenv()
+from typing import Optional
 from e2b import Sandbox
+from dotenv import load_dotenv
+from exceptions import SandboxNotFoundError
+import logging
 
-# sbx = Sandbox.create(template="nextjs-app-v2", timeout=600)
-# host = sbx.get_host(3000)
-# url = f"https://{host}"
-# print(f"Vite app running at: {url}")
+load_dotenv()
+
+logger = logging.getLogger(__name__)
 
 class E2BRunner:
+    """Manages E2B sandbox lifecycle and operations."""
     
-    @staticmethod
-    def avaliable_sandboxes():
-        sandboxes = Sandbox.list()
-        return sandboxes
+    DEFAULT_TIMEOUT = 600
+    DEFAULT_PORT = 3000
     
-    @classmethod
-    def create_sandbox(clx,template):
-        sbx = Sandbox.create(template=template, timeout=600)
-        host = sbx.get_host(3000)
-        url = f"https://{host}"
-        return url
-    
-    @classmethod
-    def connect_e2b(clx,sandbox_id : str):
-        sbx = Sandbox.connect(sandbox_id=sandbox_id, timeout=600)
-        host = sbx.get_host(3000)
-        url = f"https://{host}"
-        print(f"Next.js app running at: {url}")
-        return sbx
+    def __init__(self, port: int = DEFAULT_PORT, timeout: int = DEFAULT_TIMEOUT):
+        """
+        Initialize E2B runner with configurable settings.
+        
+        Args:
+            port: The port number for the application (default: 3000)
+            timeout: Sandbox timeout in seconds (default: 600)
+        """
+        self.port = port
+        self.timeout = timeout
+
+    def get_available_sandbox_id(self, template: Optional[str] = None) -> str:
+        """
+        Get the ID of the first available running sandbox, optionally filtered by template.
+        
+        Args:
+            template: Optional template name to filter sandboxes by
+        
+        Returns:
+            str: The sandbox ID
+            
+        Raises:
+            SandboxNotFoundError: If no running sandboxes are found
+        """
+        try:
+            paginator = Sandbox.list()
+            running_sandboxes = paginator.next_items()
+            
+            if not running_sandboxes:
+                raise SandboxNotFoundError("No running sandboxes found.")
+            
+            # Filter by template if specified
+            if template:
+                matching_sandboxes = [s for s in running_sandboxes if s.template_id == template]
+                if not matching_sandboxes:
+                    raise SandboxNotFoundError(f"No running sandboxes found for template: {template}")
+                running_sandboxes = matching_sandboxes
+            
+            sandbox_id = running_sandboxes[0].sandbox_id
+            logger.info(f"Found available sandbox: {sandbox_id}")
+            return sandbox_id
+            
+        except SandboxNotFoundError:
+            raise
+        except Exception as e:
+            logger.error(f"Error fetching available sandboxes: {e}")
+            raise
+
+    def create_sandbox(self, template: str) -> dict[str, str]:
+        """
+        Create a new sandbox from a template.
+        
+        Args:
+            template: The template name to use for sandbox creation
+            
+        Returns:
+            dict: Contains 'sandbox_id' and 'url' keys
+            
+        Raises:
+            Exception: If sandbox creation fails
+        """
+        try:
+            logger.info(f"Creating sandbox from template: {template}")
+            sandbox = Sandbox.create(template=template, timeout=self.timeout)
+            host = sandbox.get_host(self.port)
+            url = f"https://{host}"
+            
+            logger.info(f"Sandbox created successfully. ID: {sandbox.sandbox_id}, URL: {url}")
+            
+            return {
+                "sandbox_id": sandbox.sandbox_id,
+                "url": url,
+                "sandbox": sandbox
+            }
+            
+        except Exception as e:
+            logger.error(f"Failed to create sandbox: {e}")
+            raise
+
+    def connect_to_sandbox(self, sandbox_id: str) -> tuple[Sandbox, str]:
+        """
+        Connect to an existing sandbox by ID.
+        
+        Args:
+            sandbox_id: The ID of the sandbox to connect to
+            
+        Returns:
+            tuple: (Sandbox instance, URL string)
+            
+        Raises:
+            Exception: If connection fails
+        """
+        try:
+            logger.info(f"Connecting to sandbox: {sandbox_id}")
+            sandbox = Sandbox.connect(sandbox_id=sandbox_id, timeout=self.timeout)
+            host = sandbox.get_host(self.port)
+            url = f"https://{host}"
+            
+            logger.info(f"Connected to sandbox. URL: {url}")
+            return sandbox, url
+            
+        except Exception as e:
+            logger.error(f"Failed to connect to sandbox {sandbox_id}: {e}")
+            raise
+
+    def get_or_create_sandbox(self, template: str, prefer_existing: bool = True) -> tuple[Sandbox, str]:
+        """
+        Try to connect to an existing sandbox, or create a new one if none exist.
+        
+        Args:
+            template: The template name to use if creating a new sandbox
+            prefer_existing: If True, try to reuse existing sandbox; if False, always create new
+            
+        Returns:
+            tuple: (Sandbox instance, URL string)
+        """
+        if prefer_existing:
+            try:
+                sandbox_id = self.get_available_sandbox_id(template=template)
+                logger.info(f"Reusing existing sandbox for template: {template}")
+                return self.connect_to_sandbox(sandbox_id)
+            except SandboxNotFoundError:
+                logger.info(f"No existing sandbox found for template: {template}, creating new one...")
+        else:
+            logger.info("Creating new sandbox as requested...")
+        
+        result = self.create_sandbox(template)
+        return result["sandbox"], result["url"]
+
 
 if __name__ == "__main__":
-    # url = E2BRunner.create_sandbox("nextjs-app-v2")
-    # print(url)
-    paginator = E2BRunner.avaliable_sandboxes()
-    running_sbx = paginator.next_items()
-    if len(running_sbx) == 0:
-        print("No running sandboxes found.")
-    sandbox_id = running_sbx[0].sandbox_id
-    print(sandbox_id)
+    # Configure logging
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    )
+    
+    # Example usage
+    runner = E2BRunner(port=3000, timeout=600)
+    
+    try:
+        # Try to get or create a sandbox (set prefer_existing=False to always create new)
+        sandbox, url = runner.get_or_create_sandbox(
+            template="nextjs-app-v2",
+            prefer_existing=False  # Change to True to reuse existing sandboxes
+        )
+        print(f"\n✅ Sandbox ready!")
+        print(f"Sandbox ID: {sandbox.sandbox_id}")
+        print(f"URL: {url}\n")
+        
+        # Explicitly create a new one (alternative approach)
+        # result = runner.create_sandbox(template="nextjs-app-v2")
+        # print(f"New sandbox URL: {result['url']}")
+        
+        # Connect to existing by ID (alternative approach)
+        # sandbox_id = runner.get_available_sandbox_id(template="nextjs-app-v2")
+        # sandbox, url = runner.connect_to_sandbox(sandbox_id)
+        # print(f"Connected to: {url}")
+        
+    except SandboxNotFoundError as e:
+        logger.error(f"Sandbox error: {e}")
+        print(f"\n❌ Error: {e}")
+        print("Make sure you've built the template first with: uv run core/build.py\n")
+    except Exception as e:
+        logger.error(f"Unexpected error: {e}", exc_info=True)
+        print(f"\n❌ Unexpected error: {e}\n")
