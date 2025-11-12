@@ -151,7 +151,6 @@ if __name__ == "__main__":
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     )
     
-    # Example usage
     runner = E2BRunner(port=3000, timeout=600)
     
     try:
