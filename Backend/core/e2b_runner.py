@@ -142,6 +142,46 @@ class E2BRunner:
         
         result = self.create_sandbox(template)
         return result["sandbox"], result["url"]
+    
+    def get_sandbox_url(self, sandbox: Sandbox) -> str:
+        """
+        Get the URL of a given sandbox.
+        
+        Args:
+            sandbox: The Sandbox instance
+            
+        Returns:
+            str: The URL of the sandbox
+        """
+        host = sandbox.get_host(self.port)
+        url = f"https://{host}"
+        return url
+    
+    def delete_sandbox(self, sandbox: Sandbox) -> dict[str, str]:
+        """
+        Delete a sandbox.
+        
+        Args:
+            sandbox: The Sandbox instance to delete
+            
+        Returns:
+            dict: Contains 'status' and 'sandbox_id' keys
+            
+        Raises:
+            Exception: If deletion fails
+        """
+        try:
+            logger.info(f"Deleting sandbox: {sandbox.sandbox_id}")
+            sandbox.kill()
+            logger.info(f"Sandbox {sandbox.sandbox_id} deleted successfully.")
+            
+            return {
+                "status": "deleted",
+                "sandbox_id": sandbox.sandbox_id
+            }
+        except Exception as e:
+            logger.error(f"Failed to delete sandbox {sandbox.sandbox_id}: {e}")
+            raise
 
 
 if __name__ == "__main__":
