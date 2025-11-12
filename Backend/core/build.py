@@ -24,6 +24,7 @@ class Build:
         )
         
 if __name__ == "__main__":
+    """ Example usage of the Build class to build the Next.js application."""
     builder = Build()
     builder.build_nextjs_app(
         template_name=Build.DEFAULT_TEMPLATE_NAME,
