@@ -158,6 +158,18 @@ class E2BRunner:
         return url
     
     def delete_sandbox(self, sandbox: Sandbox) -> dict[str, str]:
+        """
+        Delete a sandbox.
+        
+        Args:
+            sandbox: The Sandbox instance to delete
+            
+        Returns:
+            dict: Contains 'status' and 'sandbox_id' keys
+            
+        Raises:
+            Exception: If deletion fails
+        """
         try:
             logger.info(f"Deleting sandbox: {sandbox.sandbox_id}")
             sandbox.kill()
