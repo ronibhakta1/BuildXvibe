@@ -185,7 +185,6 @@ class E2BRunner:
 
 
 if __name__ == "__main__":
-    # Configure logging
     logging.basicConfig(
         level=logging.INFO,
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
@@ -194,12 +193,11 @@ if __name__ == "__main__":
     runner = E2BRunner(port=3000, timeout=600)
     
     try:
-        # Try to get or create a sandbox (set prefer_existing=False to always create new)
         sandbox, url = runner.get_or_create_sandbox(
             template="nextjs-app-v2",
             prefer_existing=False  # Change to True to reuse existing sandboxes
         )
-        print(f"\n✅ Sandbox ready!")
+        print(f"\nSandbox ready!")
         print(f"Sandbox ID: {sandbox.sandbox_id}")
         print(f"URL: {url}\n")
         
@@ -214,8 +212,10 @@ if __name__ == "__main__":
         
     except SandboxNotFoundError as e:
         logger.error(f"Sandbox error: {e}")
-        print(f"\n❌ Error: {e}")
+        print(f"\n Error: {e}")
         print("Make sure you've built the template first with: uv run core/build.py\n")
     except Exception as e:
         logger.error(f"Unexpected error: {e}", exc_info=True)
-        print(f"\n❌ Unexpected error: {e}\n")
+        print(f"\nUnexpected error: {e}\n")
+    finally:
+        pass
