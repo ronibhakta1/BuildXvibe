@@ -195,7 +195,7 @@ if __name__ == "__main__":
     try:
         sandbox, url = runner.get_or_create_sandbox(
             template="nextjs-app-v2",
-            prefer_existing=False  # Change to True to reuse existing sandboxes
+            prefer_existing=False  
         )
         print(f"\nSandbox ready!")
         print(f"Sandbox ID: {sandbox.sandbox_id}")
